@@ -27,18 +27,18 @@ try:
     # Login
     email_input = driver.find_element_by_id("emailaddress")
     password_input = driver.find_element_by_id("password")
-    driver.implicitly_wait(5)
+    driver.implicitly_wait(1)
     email_input.send_keys(os.getenv("F4L_LOGIN"))
     password_input.send_keys(os.getenv("F4L_PASSWORD"))
-    driver.implicitly_wait(5)
+    driver.implicitly_wait(1)
     password_input.send_keys(Keys.ENTER)
-    driver.implicitly_wait(5)
+    driver.implicitly_wait(1)
     print("Logged In!")
 
     # Find your club
     if "F4L_CLUB" in os.environ:
         driver.find_element_by_id("btn_club_select").click()
-        driver.implicitly_wait(3)
+        driver.implicitly_wait(1)
         all_clubs = driver.find_element_by_id("modal_clubs").find_element_by_class_name("dialog-content").find_elements_by_class_name("button")
         for club in all_clubs:
             if os.getenv("F4L_CLUB") == club.text:
@@ -46,15 +46,15 @@ try:
                 club.click()
                 break
     
-    driver.implicitly_wait(3)
+    driver.implicitly_wait(1)
 
     # Booking process
     driver.find_element_by_id("btn_date_select").click()  # day selector
-    driver.implicitly_wait(3)
+    driver.implicitly_wait(1)
     driver.find_element_by_id("date_" + booking_date).click()  # select 2 days ahead from now
-    driver.implicitly_wait(5)
+    driver.implicitly_wait(1)
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    driver.implicitly_wait(3)
+    driver.implicitly_wait(1)
 
     # check available_slots class 2nd index -> see if child elements exist
     available_slots = driver.find_elements_by_class_name("available-slots")[1].find_elements_by_class_name(
@@ -67,9 +67,9 @@ try:
         if str(os.getenv("TIME_SLOT")) == a_slot:
             print("Time slot found: ", a_slot)
             slot.find_element_by_xpath('..').click()
-            driver.implicitly_wait(3)
+            driver.implicitly_wait(1)
             driver.find_element_by_id("dialog_book_yes").click()
-            driver.implicitly_wait(5)
+            driver.implicitly_wait(1)
             print("Reservation done!")
             break
         else:
