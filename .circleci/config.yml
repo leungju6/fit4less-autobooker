@@ -27,13 +27,11 @@ jobs:
 
 workflows:
   version: 2
-  commit:
-    jobs:
-      - build
+
   nightly:
     triggers:
       - schedule:
-          cron: "30 15 * * *"
+          cron: "40 15 * * *"
           filters:
             branches:
               only:
