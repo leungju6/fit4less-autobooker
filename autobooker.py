@@ -8,7 +8,6 @@ from selenium.webdriver.common.keys import Keys
 load_dotenv()
 # set permissions for local chromedriver to test locally
 start_url = "https://myfit4less.gymmanager.com/portal/login.asp"
-booking_date = str(datetime.now().date() + timedelta(days=int(os.getenv("DAYS")) or 2))
 chrome_options = Options()
 
 # first condition just for debugging locally
@@ -48,36 +47,40 @@ try:
     
     driver.implicitly_wait(5)
 
-    # Booking process
-    driver.find_element_by_id("btn_date_select").click()  # day selector
-    driver.implicitly_wait(20)
-    driver.find_element_by_id("date_" + booking_date).click()  # select 2 days ahead from now
-    driver.implicitly_wait(20)
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    driver.implicitly_wait(5)
-
-    # check available_slots class 2nd index -> see if child elements exist
-    available_slots = driver.find_elements_by_class_name("available-slots")[1].find_elements_by_class_name("time-slot-box")
+    # Booking process for T+0, T+1, or T+2 days
+    for i in range(3):
+        if "TIME_SLOT" + str(i) not in os.environ:
+            continue
+        
+        booking_date = str(datetime.now().date() + timedelta(days=i))
+        driver.find_element_by_id("btn_date_select").click()  # day selector
+        driver.implicitly_wait(20)
+        driver.find_element_by_id("date_" + booking_date).click()
+        driver.implicitly_wait(20)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        driver.implicitly_wait(5)
     
-    if len(available_slots) == 0:
-        print("No available time slots!")
-        
-    d_slot = datetime.strptime(str(os.getenv("TIME_SLOT")), '%I:%M%p')
-        
-    for slot in available_slots:
-        a_slot = datetime.strptime(str(slot.text).split()[5] + str(slot.text).split()[6], '%I:%M%p')
-        if d_slot <= a_slot:
-            slot.find_element_by_xpath('..').click()
-            driver.implicitly_wait(10)
-            driver.find_element_by_id("dialog_book_yes").click()
-            driver.implicitly_wait(10)
-            print("Time slot found: ", a_slot)
-            print("Reservation done!")
-            break
-        else:
-            print("Skipping slot:", a_slot)
+        # check available_slots class 2nd index -> see if child elements exist
+        available_slots = driver.find_elements_by_class_name("available-slots")[1].find_elements_by_class_name("time-slot-box")
+        if len(available_slots) == 0:
+            print("No available time slots for " + booking_date)
+            continue
+            
+        d_slot = datetime.strptime(str(os.getenv("TIME_SLOT"+str(i))), '%I:%M%p')
+            
+        for slot in available_slots:
+            a_slot = datetime.strptime(str(slot.text).split()[5] + str(slot.text).split()[6], '%I:%M%p')
+            if d_slot <= a_slot:
+                slot.find_element_by_xpath('..').click()
+                driver.implicitly_wait(10)
+                driver.find_element_by_id("dialog_book_yes").click()
+                driver.implicitly_wait(10)
+                print("Booked {} on {}".format(a_slot.strftime("%H:%M %p"),booking_date))
+                break
+            else:
+                print("Skipping slot: {}".format(a_slot.strftime("%H:%M %p")))
 
 except Exception as err:
     print(str(err))
 finally:
-    driver.quit()
+    driver.Quit()
