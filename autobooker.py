@@ -57,19 +57,21 @@ try:
     driver.implicitly_wait(5)
 
     # check available_slots class 2nd index -> see if child elements exist
-    available_slots = driver.find_elements_by_class_name("available-slots")[1].find_elements_by_class_name(
-        "time-slot-box")
+    available_slots = driver.find_elements_by_class_name("available-slots")[1].find_elements_by_class_name("time-slot-box")
+    
     if len(available_slots) == 0:
         print("No available time slots!")
         
+    d_slot = datetime.strptime(str(os.getenv("TIME_SLOT")), '%I:%M%p')
+        
     for slot in available_slots:
-        a_slot = str(slot.text).split(" ")[4] + str(slot.text).split(" ")[5].split('\n')[0]
-        if str(os.getenv("TIME_SLOT")) == a_slot:
-            print("Time slot found: ", a_slot)
+        a_slot = datetime.strptime(str(slot.text).split()[5] + str(slot.text).split()[6], '%I:%M%p')
+        if d_slot <= a_slot:
             slot.find_element_by_xpath('..').click()
             driver.implicitly_wait(10)
             driver.find_element_by_id("dialog_book_yes").click()
             driver.implicitly_wait(10)
+            print("Time slot found: ", a_slot)
             print("Reservation done!")
             break
         else:
