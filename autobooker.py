@@ -83,4 +83,4 @@ try:
 except Exception as err:
     print(str(err))
 finally:
-    driver.Quit()
+    driver.quit()
