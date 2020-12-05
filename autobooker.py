@@ -75,10 +75,10 @@ try:
                 driver.implicitly_wait(10)
                 driver.find_element_by_id("dialog_book_yes").click()
                 driver.implicitly_wait(10)
-                print("Booked {} on {}".format(a_slot.strftime("%H:%M %p"),booking_date))
+                print("Booked {} on {}".format(a_slot.strftime("%I:%M %p"),booking_date))
                 break
             else:
-                print("Skipping slot: {}".format(a_slot.strftime("%H:%M %p")))
+                print("Skipping slot: {}".format(a_slot.strftime("%I:%M %p")))
 
 except Exception as err:
     print(str(err))
