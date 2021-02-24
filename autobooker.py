@@ -52,6 +52,7 @@ try:
         if "TIME_SLOT" + str(i) not in os.environ:
             continue
         
+        driver.implicitly_wait(30)
         booking_date = str(datetime.now().date() + timedelta(days=i))
         driver.find_element_by_id("btn_date_select").click()  # day selector
         driver.implicitly_wait(20)
